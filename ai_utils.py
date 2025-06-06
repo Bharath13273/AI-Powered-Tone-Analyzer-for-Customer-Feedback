@@ -1,8 +1,13 @@
 from google import genai
 import time
 from google.genai.errors import ServerError
+import smtplib
+from email.message import EmailMessage
 
-client = genai.Client(api_key="you api")
+client = genai.Client(api_key="you api key")
+
+SENDER_EMAIL = "mail id"
+SENDER_PASSWORD = "email app password"
 
 def retry_on_server_error(func):
     def wrapper(*args, **kwargs):
@@ -40,4 +45,15 @@ def generate_response(comment, tone, user, product):
         contents=prompt
     )
     return response.text.strip()
+
+def send_email(to_email, subject, body):
+    msg = EmailMessage()
+    msg["Subject"] = subject
+    msg["From"] = SENDER_EMAIL
+    msg["To"] = to_email
+    msg.set_content(body)
+
+    with smtplib.SMTP_SSL("smtp.gmail.com", 465) as smtp:
+        smtp.login(SENDER_EMAIL, SENDER_PASSWORD)
+        smtp.send_message(msg)
 
